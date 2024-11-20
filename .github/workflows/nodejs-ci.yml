@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Node.js CI with File Increment
 
 on:
   push:
@@ -30,3 +30,40 @@ jobs:
     # Step 4: Run tests
     - name: Run tests
       run: npm test
+
+  increment_file:
+    runs-on: ubuntu-latest
+    needs: build  # This job will run after the 'build' job is successful
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Increment value in the file
+    - name: Increment value
+      run: |
+        # Define the file name
+        FILE="counter.txt"
+
+        # Ensure the file exists, or initialize it with 0
+        if [ ! -f "$FILE" ]; then
+          echo "0" > $FILE
+        fi
+
+        # Read the current value, increment it, and save back to the file
+        CURRENT=$(cat $FILE)
+        INCREMENTED=$((CURRENT + 1))
+        echo $INCREMENTED > $FILE
+
+        # Display the new value
+        echo "Incremented value: $INCREMENTED"
+
+    # Step 3: Commit and push the updated file
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add counter.txt
+        git commit -m "Incremented counter value to $INCREMENTED"
+        git push
