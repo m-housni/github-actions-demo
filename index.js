@@ -1,4 +1,4 @@
-// index.js
+// index.js 
 function sum(a, b) {
     return a + b;
   }
